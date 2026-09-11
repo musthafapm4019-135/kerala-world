@@ -1,0 +1,10 @@
+'use client';
+import { useEffect, useRef } from 'react';
+import type { World } from './world';
+type Props={world:React.RefObject<World|null>;driving:boolean;hidden:boolean;open:(panel:string)=>void};
+export default function TouchControls({world,driving,hidden,open}:Props){
+ const held=useRef(new Map<number,string>());
+ useEffect(()=>{const release=()=>{for(const key of held.current.values())world.current?.input(key,false);held.current.clear()};window.addEventListener('blur',release);document.addEventListener('visibilitychange',release);return()=>{release();window.removeEventListener('blur',release);document.removeEventListener('visibilitychange',release)}},[world]);
+ const buttons=[{key:'a',label:'Steer left',text:'◀',cls:'left'},{key:'d',label:'Steer right',text:'▶',cls:'right'},{key:'s',label:driving?'Reverse':'Walk backward',text:'▼',cls:'reverse'},{key:'w',label:driving?'Accelerate':'Walk forward',text:'▲',cls:'forward'},{key:' ',label:driving?'Brake':'Jump',text:driving?'BRAKE':'JUMP',cls:'brake'}];
+ return <div className={`touch-controls ${hidden?'is-hidden':''}`} aria-label="Touch game controls"><div className="touch-look-hint">Drag the world to look around</div>{buttons.map(b=><button key={b.key} className={`touch-key ${b.cls}`} aria-label={b.label} onContextMenu={e=>e.preventDefault()} onPointerDown={e=>{e.preventDefault();e.currentTarget.setPointerCapture(e.pointerId);held.current.set(e.pointerId,b.key);world.current?.input(b.key,true)}} onPointerUp={e=>{world.current?.input(b.key,false);held.current.delete(e.pointerId)}} onPointerCancel={e=>{world.current?.input(b.key,false);held.current.delete(e.pointerId)}} onLostPointerCapture={e=>{world.current?.input(b.key,false);held.current.delete(e.pointerId)}}>{b.text}</button>)}<button className="touch-key enter" onClick={()=>world.current?.toggleCar()}>{driving?'EXIT':'ENTER'}</button><div className="touch-menu"><button onClick={()=>open('map')}>Map</button><button onClick={()=>open('phone')}>Phone</button><button onClick={()=>open('chat')}>Chat</button></div></div>
+}
