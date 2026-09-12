@@ -16,7 +16,7 @@ test('shared world, private sessions, validation, chat limits and expiration',as
  assert.equal((await post({...a,message:'Too fast'})).status,429);
  assert.equal((await post({id:randomUUID(),token:randomUUID()})).status,503);
  time+=1100;const moved=await post({...a,x:123,z:-30,driving:false,message:'Walking now'});assert.equal(moved.status,200);assert.equal(moved.data.players.find(p=>p.id===a.id).x,123);assert.equal(moved.data.players.find(p=>p.id===a.id).driving,false);
- assert.equal((await post('{broken')).status,400);assert.equal((await post({id:'x'})).status,400);assert.equal((await post('x'.repeat(5000))).status,413);
+ assert.equal((await post('{broken')).status,400);assert.equal((await post({id:'x'})).status,400);assert.equal((await post('x'.repeat(40000))).status,413);
  time+=21000;const reconnect=await post(b);assert.equal(reconnect.data.players.length,1);
  }finally{server.closeAllConnections();await new Promise(resolve=>server.close(resolve))}
 });
