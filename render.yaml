@@ -1,0 +1,14 @@
+services:
+  - type: web
+    name: kerala-world-backend
+    runtime: node
+    plan: free
+    region: singapore
+    buildCommand: node --check backend/server.mjs
+    startCommand: node backend/server.mjs
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: NODE_VERSION
+        value: 22
